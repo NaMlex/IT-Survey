@@ -44,7 +44,7 @@ def get_data_by_user_choice():
          print("1: Most popular technologies")
          print("2: Salary")
          print("3: Databases")
-         user_input = input("Select a number from 1 to 3: ")
+         user_input = input("Select a number from 1 to 3:\n ")
          if validate(user_input):
             choice = int(user_input)
             if choice == 1:
