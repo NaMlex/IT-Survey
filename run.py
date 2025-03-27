@@ -1,23 +1,17 @@
 import gspread
 from google.oauth2.service_account import Credentials
-import pprint
+import prettytable as pt
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
     "https://www.googleapis.com/auth/drive"
-    ]
+]
 
 CREDS = Credentials.from_service_account_file('creds.json')
 SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
 SHEET = GSPREAD_CLIENT.open('IT-Survey')
-
-
-# Open the specific sheets
-sheet1 = SHEET.worksheet('Most-popular-technologies')
-sheet2 = SHEET.worksheet('Salary')
-sheet3 = SHEET.worksheet('Databases')
 
 def validate(values):
     """
@@ -33,9 +27,7 @@ def validate(values):
         print(f"Invalid data: {e}, please try again.\n")
         return False
 
-
 def get_data_by_user_choice():
-
     """
     Get user choice
     """
@@ -48,19 +40,26 @@ def get_data_by_user_choice():
          if validate(user_input):
             choice = int(user_input)
             if choice == 1:
-                return SHEET.worksheet('Most-popular-technologies').get_all_values()
+                return 'Most-popular-technologies'
             elif choice == 2:
-                return SHEET.worksheet('Salary').get_all_values()
+                return 'Salary'
             elif choice == 3:
-                return SHEET.worksheet('Databases').get_all_values()
-            else:
-                print("Please enter a valid number between 1 and 3.")
+                return 'Databases'
          else:
             print("Invalid input, please try again.")
 
 def main():
-    data = get_data_by_user_choice()
-    print(data)
+    sheet_name = get_data_by_user_choice()
+    data = SHEET.worksheet(sheet_name).get_all_values()
+    table = pt.PrettyTable()
+    if data:
+        # Add columns to the table based on keys of the first record
+        table.field_names = data[0]
+
+        # Add rows to the table
+        for row in data[1:]:
+            table.add_row(row)
+    print(table)
 
 if __name__ == "__main__":
     main()
